@@ -21,7 +21,7 @@ public class TagController {
     @GetMapping
     // Y = only visible
     // N = only not visible
-    // A = All
+    // A = All (visible and not visible)
     public ResponseEntity<?> getAllTags(@RequestParam(defaultValue = "Y") Character visible){
         List<Tag> tags = tagService.getAllTags(visible);
         if(tags.isEmpty())

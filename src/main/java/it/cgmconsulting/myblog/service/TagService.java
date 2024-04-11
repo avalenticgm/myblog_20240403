@@ -14,8 +14,6 @@ import java.util.List;
 @Slf4j
 public class TagService {
 
-    //@Autowired TagRepository tagRepository; // Dependency injection by field
-
     private final TagRepository tagRepository;  // Dependency injection by constructor. Il costruttore è generato dall'annotazione di Lombok @RequiredArgsConstructor
 
     // lista di Tag parametrizzata
@@ -38,11 +36,6 @@ public class TagService {
     }
 
 
-
-
-
-
-    // inserire un nuovo Tag
     // modificare un Tag esistente
 
     // cercare uno specifico Tag
