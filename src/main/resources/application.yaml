@@ -47,3 +47,11 @@ logging:
     it.cgmconsulting.myblog: info
     org.hibernate.orm.jdbc.bind: trace
     org.springframework: info
+
+# CUSTOM PROPERTIES
+application:
+  security:
+    jwt:
+      tokenType: Bearer
+      secret-key: WS27AFx7dmB8OEueK6RW5F5C51MwDH57CoI6NDgZCBJ2306qBZISUL3KYaF9RM67
+      expiration: 86400000 # milliseconds -> 1 day

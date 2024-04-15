@@ -44,6 +44,19 @@ public class ExceptionManagement {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    public ResponseEntity<String> handleArgumentNotValidValue(MethodArgumentNotValidException ex) {
+
+        BindingResult bindingResults = ex.getBindingResult();
+        List<String> errors = bindingResults
+                .getFieldErrors()
+                .stream().map(e -> {
+                    return e.getField()+": "+e.getDefaultMessage();
+                })
+                .toList();
+        return new ResponseEntity<String>(errors.toString(), HttpStatus.BAD_REQUEST);
+    }
+
 
 
 
