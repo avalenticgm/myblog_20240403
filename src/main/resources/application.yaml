@@ -35,6 +35,19 @@ spring:
     show-sql: true
     open-in-view: false
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    # username -> equivale alla email senza @gmail.com
+    username: ${MAIL_USERNAME}
+    # password -> non è la vostra password ma quella generata da google per l'utilizzo da parte di applicazioni di terze parti
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            required: true
 
 spring-doc:
   swagger-ui:
@@ -55,3 +68,9 @@ application:
       tokenType: Bearer
       secret-key: WS27AFx7dmB8OEueK6RW5F5C51MwDH57CoI6NDgZCBJ2306qBZISUL3KYaF9RM67
       expiration: 86400000 # milliseconds -> 1 day
+  mail:
+    # EMAIL PER ESTESO
+    sender: ${MAIL}
+  confirmCode:
+    # validita espressa in minuti -> 1440 min = 1 day
+    validity: 1440

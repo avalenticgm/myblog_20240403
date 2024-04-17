@@ -4,6 +4,8 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -23,6 +25,11 @@ public class ExceptionManagement {
         return new ResponseEntity<String>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(GenericException.class)
+    public ResponseEntity<String> genericExceptionManagement(GenericException ex){
+        return new ResponseEntity<String>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<String> missingServletRequestParameterExceptionManagement(MissingServletRequestParameterException ex){
         return new ResponseEntity<String>(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -33,6 +40,15 @@ public class ExceptionManagement {
         return new ResponseEntity<String>(ex.getCause().getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> badCredentialsExceptionManagement(BadCredentialsException ex){
+        return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<String> disabledExceptionManagement(DisabledException ex){
+        return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
 
 
     @ExceptionHandler({ConstraintViolationException.class})
