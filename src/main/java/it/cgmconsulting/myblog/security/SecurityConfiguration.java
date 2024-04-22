@@ -49,6 +49,9 @@ public class SecurityConfiguration {
                     .authenticated()
             );
 
+
+
+
         http.sessionManagement((sessionManagement) ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
@@ -68,4 +71,5 @@ public class SecurityConfiguration {
 
         return http.build();
     }
+
 }

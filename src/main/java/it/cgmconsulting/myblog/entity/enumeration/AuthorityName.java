@@ -1,5 +1,7 @@
 package it.cgmconsulting.myblog.entity.enumeration;
 
+import java.util.HashSet;
+
 public enum AuthorityName {
 
     ADMIN,
@@ -7,4 +9,5 @@ public enum AuthorityName {
     MEMBER, // scrive commenti e vota i post
     MODERATOR, // si occupa delle segnalazioni
     GUEST // stato in cui versa un utente che si è registrato ma non ha ancora confermato la propria email
+
 }

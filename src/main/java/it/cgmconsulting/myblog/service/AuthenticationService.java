@@ -3,6 +3,8 @@ package it.cgmconsulting.myblog.service;
 import it.cgmconsulting.myblog.entity.Authority;
 import it.cgmconsulting.myblog.entity.Registration;
 import it.cgmconsulting.myblog.entity.User;
+import it.cgmconsulting.myblog.entity.enumeration.AuthorityName;
+import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
 import it.cgmconsulting.myblog.mail.Mail;
 import it.cgmconsulting.myblog.mail.MailService;
 import it.cgmconsulting.myblog.payload.request.SigninRequest;
@@ -23,10 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -112,11 +111,62 @@ public class AuthenticationService {
         return Arrays.stream(authorities).anyMatch(s -> s.contains(authorityRepository.findByAuthorityDefaultTrue().getAuthorityName().name()));
     }
 
-    private boolean confirm(String confirmCode){
-        // verificare che il token non sia scaduto
-        Registration reg = registrationService.
-        // se è valido, abilitare lo user, cambiargli l'authority
-        // altrimenti reinviare l'email con nuovo token
+    @Transactional
+    public String confirm(String confirmCode){
+        // verificare che il token (confimCode) non sia scaduto
+        Optional<Registration> reg = registrationService.findByConfirmCode(confirmCode);
+
+        // Confirm code presente ma scaduto
+        if(reg.isPresent() && LocalDateTime.now().isAfter(reg.get().getEndDate())) {
+            Registration oldRegistration = reg.get();
+            Registration newRegistration = Registration.builder()
+                    .confirmCode(UUID.randomUUID().toString())
+                    .endDate(LocalDateTime.now().plusMinutes(validity))
+                    .user(oldRegistration.getUser())
+                    .build();
+            registrationService.save(newRegistration);
+            registrationService.delete(oldRegistration);
+
+            Mail mail = mailService.createMail(newRegistration.getUser(),
+                    "Myblog - Registration confirm",
+                    "Hi " + newRegistration.getUser().getUsername() + ",\n please click here to confirm your email \n http://localhost:8090/v0/auth?confirmCode=" + newRegistration.getConfirmCode());
+            mailService.sendMail(mail);
+            return "A new confirmation code has been sent to you. Please check your mail";
+        }
+        // confirm code NON presente
+        else if(reg.isEmpty())
+            return "You already confirmed your registration";
+        // Confirm code presente e valido
+        else {
+            reg.get().getUser().setEnabled(true);
+            Authority authority = authorityRepository.findByAuthorityName(AuthorityName.MEMBER);
+            reg.get().getUser().setAuthorities(Collections.singleton(authority));
+            registrationService.delete(reg.get());
+            return "Now you are enabled. Please log in";
+        }
+
     }
+
+    @Transactional
+    public AuthenticationResponse changeRole(int id, Set<String> auths) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        Set<AuthorityName> authorityNames = EnumSet.noneOf(AuthorityName.class);
+        for(String s : auths){
+            authorityNames.add(AuthorityName.valueOf(s));
+        }
+        Set<Authority> authorities = authorityRepository.findByAuthorityNameIn(authorityNames);
+        user.setAuthorities(authorities);
+
+        AuthenticationResponse authenticationResponse = AuthenticationResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .authorities(authorities(user.getAuthorities()))
+                .build();
+
+        return authenticationResponse;
+
+    }
+
 
 }

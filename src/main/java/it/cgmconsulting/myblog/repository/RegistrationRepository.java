@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface RegistrationRepository extends JpaRepository<Registration, Integer> {
 
     Optional<Registration> findByConfirmCodeAndEndDateAfter(String confirmCode, LocalDateTime now);
+    Optional<Registration> findByConfirmCode(String confirmCode);
 }

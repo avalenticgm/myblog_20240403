@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +22,15 @@ public class RegistrationService {
         registrationRepository.save(registration);
     }
 
-    public Registration isValidRegistrationToken(String confirmCode){
-        return registrationRepository.findByConfirmCodeAndEndDateAfter(confirmCode, LocalDateTime.now())
-                .orElseThrow(() -> new GenericException("Token expired"));
+    public Optional<Registration> isValidRegistrationToken(String confirmCode){
+        return registrationRepository.findByConfirmCodeAndEndDateAfter(confirmCode, LocalDateTime.now());
+    }
+
+    public Optional<Registration> findByConfirmCode(String confirmCode){
+        return registrationRepository.findByConfirmCode(confirmCode);
+    }
+
+    public void delete(Registration registration){
+        registrationRepository.delete(registration);
     }
 }

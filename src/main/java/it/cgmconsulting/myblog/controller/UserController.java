@@ -1,21 +1,29 @@
 package it.cgmconsulting.myblog.controller;
 
+
 import it.cgmconsulting.myblog.payload.request.SigninRequest;
 import it.cgmconsulting.myblog.payload.request.SignupRequest;
 import it.cgmconsulting.myblog.service.AuthenticationService;
-import jakarta.mail.MessagingException;
+
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final AuthenticationService authenticationService;
@@ -35,8 +43,15 @@ public class UserController {
 
     @PatchMapping("/v0/auth")
     public ResponseEntity<?> confirm(@RequestParam @NotBlank @Size(max=36) String confirmCode){
-
+        return new ResponseEntity<>(authenticationService.confirm(confirmCode), HttpStatus.OK);
     }
 
+    @PatchMapping("/v1/user/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> changeRole(@PathVariable @Min(1) int id, Set<String> auths){
+        System.out.println("ciao");
+        return new ResponseEntity<>(authenticationService.changeRole(id, auths), HttpStatus.OK);
+
+    }
 
 }
