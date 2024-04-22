@@ -48,7 +48,7 @@ public class UserController {
 
     @PatchMapping("/v1/user/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> changeRole(@PathVariable @Min(1) int id, Set<String> auths){
+    public ResponseEntity<?> changeRole(@PathVariable @Min(1) int id, @RequestParam @NotEmpty Set<String> auths){
         System.out.println("ciao");
         return new ResponseEntity<>(authenticationService.changeRole(id, auths), HttpStatus.OK);
 
