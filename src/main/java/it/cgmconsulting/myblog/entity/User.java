@@ -64,6 +64,7 @@ public class User extends CreationUpdate implements UserDetails {
         this.password = password;
     }
 
+
     /* Inherited methods from org.springframework.security.core.userdetails.UserDetails */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

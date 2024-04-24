@@ -24,8 +24,6 @@ public class TagService {
         List<Tag> tags = new ArrayList<>();
         if(visible == 'A')
             tags = tagRepository.findAllByOrderByTagName();
-        else if (visible == 'Y')
-            tags = tagRepository.findByVisibleTrueOrderByTagName();
         else if (visible == 'N')
             tags = tagRepository.findByVisibleFalseOrderByTagName();
 
@@ -62,5 +60,9 @@ public class TagService {
     // cercare uno specifico Tag
     public Tag getTag(short id){
         return tagRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Tag", "id", id));
+    }
+
+    public List<Tag> getAllVisibleTags(){
+        return tagRepository.findByVisibleTrueOrderByTagName();
     }
 }
