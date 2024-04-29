@@ -226,7 +226,7 @@ public class AuthenticationService {
     public GetMeResponse changeMe(ChangeMeRequest request, UserDetails userDetails){
         User user = (User) userDetails;
 
-        if(userRepository.existsByMailAndIdNot(request.email(), user.getId()))
+        if(userRepository.existsByEmailAndIdNot(request.email(), user.getId()))
             return null;
 
         user.setBio(request.bio());
@@ -246,5 +246,18 @@ public class AuthenticationService {
                 .build();
 
         return me;
+    }
+
+    public String deleteMe(UserDetails userDetails){
+        User user = (User) userDetails;
+        user.setEnabled(false);
+        String s = UUID.randomUUID().toString();
+        user.setEmail(s);
+        user.setFirstname(s);
+        user.setLastname(s);
+        user.setBio(s);
+        user.setUsername(s.substring(0,19));
+        userRepository.save(user);
+        return "Your account has been removed";
     }
 }

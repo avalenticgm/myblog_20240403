@@ -75,3 +75,11 @@ application:
   confirmCode:
     # validita espressa in minuti -> 1440 min = 1 day
     validity: 1440
+  image:
+    avatar:
+      # 5kb = 1024 byte * 5
+      size: 5120
+      # height and width in pixel
+      height: 100
+      width: 100
+      extensions: jpg,jpeg,png

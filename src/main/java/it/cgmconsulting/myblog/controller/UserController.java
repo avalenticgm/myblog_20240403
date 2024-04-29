@@ -87,4 +87,10 @@ public class UserController {
         return new ResponseEntity<>(me, HttpStatus.OK);
     }
 
+    @PutMapping("/v1/user/remove")
+    public ResponseEntity<?> deleteMe(@AuthenticationPrincipal UserDetails userDetails){
+        return new ResponseEntity<>(authenticationService.deleteMe(userDetails), HttpStatus.OK);
+
+    }
+
 }
