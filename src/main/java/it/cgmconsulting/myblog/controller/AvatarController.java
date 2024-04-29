@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +44,12 @@ public class AvatarController {
         if(avatar != null)
             return new ResponseEntity<>(avatar, HttpStatus.OK);
         return new ResponseEntity<>("Something went wrong during the file upload", HttpStatus.BAD_REQUEST);
+    }
+
+    @DeleteMapping("/v1/avatar")
+    public ResponseEntity<?> deleteAvatar(@AuthenticationPrincipal UserDetails userDetails){
+        imageService.removeAvatar(userDetails);
+        return new ResponseEntity<>("Your avatar has been removed", HttpStatus.OK);
     }
 
 }

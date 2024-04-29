@@ -29,7 +29,7 @@ public class Post extends CreationUpdate {
     @Column(length = 16)
     private String image;
 
-    private LocalDate publicationDate;
+    private LocalDate publicationDate; // se è a null oppure publicationDate.afterOrEqual(LocalDate.now()) significa che il post non è pubblicato
 
     private short totComments;
 

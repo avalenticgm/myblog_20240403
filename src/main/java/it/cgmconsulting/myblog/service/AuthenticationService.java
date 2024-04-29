@@ -1,8 +1,6 @@
 package it.cgmconsulting.myblog.service;
 
-import it.cgmconsulting.myblog.entity.Authority;
-import it.cgmconsulting.myblog.entity.Registration;
-import it.cgmconsulting.myblog.entity.User;
+import it.cgmconsulting.myblog.entity.*;
 import it.cgmconsulting.myblog.entity.enumeration.AuthorityName;
 import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
 import it.cgmconsulting.myblog.mail.Mail;
@@ -12,8 +10,10 @@ import it.cgmconsulting.myblog.payload.request.ChangePasswordRequest;
 import it.cgmconsulting.myblog.payload.request.SigninRequest;
 import it.cgmconsulting.myblog.payload.request.SignupRequest;
 import it.cgmconsulting.myblog.payload.response.AuthenticationResponse;
+import it.cgmconsulting.myblog.payload.response.AvatarResponse;
 import it.cgmconsulting.myblog.payload.response.GetMeResponse;
 import it.cgmconsulting.myblog.repository.AuthorityRepository;
+import it.cgmconsulting.myblog.repository.AvatarRepository;
 import it.cgmconsulting.myblog.repository.UserRepository;
 import it.cgmconsulting.myblog.security.JwtService;
 import jakarta.mail.MessagingException;
@@ -47,6 +47,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final MailService mailService;
     private final RegistrationService registrationService;
+    private final AvatarRepository avatarRepository;
 
 
 
@@ -210,6 +211,10 @@ public class AuthenticationService {
     public GetMeResponse getMe(UserDetails userDetails){
 
         User user = (User) userDetails;
+        Avatar avatar = avatarRepository.findById(new AvatarId(user)).orElse(null);
+        AvatarResponse avatarResponse = null;
+        if(avatar != null)
+            avatarResponse = new AvatarResponse(avatar.getAvatarId().getUserId().getId(), avatar.getFilename(), avatar.getFiletype(), avatar.getData());
 
         GetMeResponse me = GetMeResponse.builder()
                 .id(user.getId())
@@ -218,6 +223,7 @@ public class AuthenticationService {
                 .username(user.getUsername())
                 .email((user.getEmail()))
                 .bio(user.getBio())
+                .avatar(avatarResponse)
                 .build();
 
         return me;
