@@ -5,7 +5,9 @@ import it.cgmconsulting.myblog.payload.response.PostDetailResponse;
 import it.cgmconsulting.myblog.payload.response.PostResponse;
 import it.cgmconsulting.myblog.service.PostService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,5 +56,22 @@ public class PostController {
             return new ResponseEntity<>("No posts found", HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
+
+    @PatchMapping("/v1/posts/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> publishPost(@PathVariable int id, @RequestParam @FutureOrPresent LocalDate publicationDate){
+        return new ResponseEntity<>(postService.publishPost(id, publicationDate), HttpStatus.OK);
+    }
+
+    @PatchMapping("/v1/posts/tags/{id}")
+    @PreAuthorize("hasAnyAuthority('WRITER', 'ADMIN')")
+    public ResponseEntity<?> addUpdateTagsToPost(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable int id,
+            @RequestParam Set<String> tagNames){
+        postService.addUpdateTagsToPost(userDetails, id, tagNames);
+        return new ResponseEntity<>("Tags added to post", HttpStatus.OK);
+    }
+
 
 }

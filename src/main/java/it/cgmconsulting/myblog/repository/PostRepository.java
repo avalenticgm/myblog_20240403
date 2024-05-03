@@ -32,9 +32,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "p.title, " +
             "p.overview, " +
             "p.image, " +
-            "p.publicationDate, " +
             "p.totComments," +
-            "(SELECT AVG(r.rate) FROM Rating r WHERE r.ratingId.postId.id = p.id) AS average" +
+            "(SELECT COALESCE(AVG(r.rate), 0d) FROM Rating r WHERE r.ratingId.postId.id = p.id) AS average" +
             ") FROM Post p " +
             "WHERE (p.publicationDate IS NOT NULL " +
             "AND p.publicationDate <= :now)")

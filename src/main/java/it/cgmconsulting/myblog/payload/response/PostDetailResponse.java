@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class PostDetailResponse {
@@ -20,6 +22,7 @@ public class PostDetailResponse {
     private double average; // i voti vanno da 1 a 5, quindi una media a 0 indica che il post non è mai stato votato
     private String author;
     private List<CommentResponse> comments = new ArrayList<>();
+    private Set<String> tagNames = new HashSet<>();
 
     public PostDetailResponse(String title, String content, String image, LocalDate publicationDate, short totComments, double average, String author) {
         this.title = title;
