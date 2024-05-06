@@ -83,3 +83,7 @@ application:
       height: 100
       width: 100
       extensions: jpg,jpeg,png
+  comment:
+    # Lo user ha tempo 60 secondi per modificare o eliminare il proprio commento
+    # Durante questo lasso di tempo il commento non è visibile se non  dall'autore stesso
+    time: 60

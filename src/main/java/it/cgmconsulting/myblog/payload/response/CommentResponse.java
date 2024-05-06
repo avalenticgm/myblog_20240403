@@ -12,6 +12,6 @@ public class CommentResponse {
     private int id;
     private String comment;
     private String author;
-    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private Integer parentId;
 }
