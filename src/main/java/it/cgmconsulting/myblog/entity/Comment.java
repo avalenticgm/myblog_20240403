@@ -39,4 +39,12 @@ public class Comment extends CreationUpdate {
         this.postId = postId;
         this.parent = parent;
     }
+
+    // PARENT
+    // Post : spaghetti alla carbonara
+    //      c1: buoni!; 5; 1; null
+    //          c2: non è vero fanno schifo!; 6; 1; c1
+    //              c3: tu fai schifo! 5; 1; c2
+    //              c5: ha ragione pippo, tu fai schifo; 12, 1; c2
+    //      c4: con il guanciale è ottimo; 8; 1; null
 }

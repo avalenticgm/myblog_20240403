@@ -14,21 +14,21 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     // JPQL -> Java Persistence Query Language
     @Query(value="SELECT new it.cgmconsulting.myblog.payload.response.PostDetailResponse(" +
+            "p.id, " +
             "p.title, " +
             "p.content, " +
             "p.image, " +
             "p.publicationDate, " +
             "p.totComments, " +
-            //"AVG(r.rate) AS average, " +
-            "COALESCE(AVG(r.rate), 0d), " +
+            "(SELECT COALESCE(AVG(r.rate), 0d) FROM Rating r WHERE r.ratingId.postId.id = p.id) AS average, " +
             "p.userId.username" +
             ") FROM Post p " +
-            "LEFT JOIN Rating r ON r.ratingId.postId.id = p.id " +
             "WHERE p.id = :id " +
             "AND (p.publicationDate IS NOT NULL AND p.publicationDate <= :now)")
     Optional<PostDetailResponse> getPostById(int id, LocalDate now);
 
     @Query(value="SELECT new it.cgmconsulting.myblog.payload.response.PostResponse(" +
+            "p.id, " +
             "p.title, " +
             "p.overview, " +
             "p.image, " +

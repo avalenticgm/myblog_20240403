@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class PostResponse {
 
+    private int id;
     private String title;
     private String overview;
     private String image;

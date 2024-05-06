@@ -26,8 +26,7 @@ import java.util.Set;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
-    private final TagRepository tagRepository;
+    private final TagService tagService;
 
     public String  createPost(PostRequest request, UserDetails userDetails){
         Post post = new Post(request.getTitle(), request.getContent(), (User) userDetails);
@@ -37,8 +36,7 @@ public class PostService {
 
     public String editPost(int id, PostRequest request, UserDetails userDetails){
         User user = (User) userDetails;
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Post", "Id", id));
+        Post post = findPostById(id);
         boolean isAdmin = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch("ADMIN"::equals);
@@ -56,9 +54,13 @@ public class PostService {
     }
 
     public PostDetailResponse getPost(int id){
-        PostDetailResponse postResponse = postRepository.getPostById(id, LocalDate.now()).orElseThrow(
+        PostDetailResponse postDetailResponse = postRepository.getPostById(id, LocalDate.now()).orElseThrow(
                 () -> new ResourceNotFoundException("Post", "Id", id));
-        return postResponse;
+        Set<String> tagNames = tagService.getTagNamesByPost(id);
+        if(!tagNames.isEmpty()){
+            postDetailResponse.setTagNames(tagNames);
+        }
+        return postDetailResponse;
     }
 
     public List<PostResponse> getAllVisiblePosts() {
@@ -67,8 +69,7 @@ public class PostService {
 
     @Transactional
     public String publishPost(int id, LocalDate publicationDate){
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Post", "Id", id));
+        Post post = findPostById(id);
         post.setPublicationDate(publicationDate);
         return "Publication post on "+publicationDate;
     }
@@ -76,15 +77,21 @@ public class PostService {
     @Transactional
     public void addUpdateTagsToPost(UserDetails userDetails, int id, Set<String> tagNames) {
         User user = (User) userDetails;
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Post", "Id", id));
+        Post post = findPostById(id);
         boolean isAdmin = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch("ADMIN"::equals);
 
         if( user.equals(post.getUserId()) || isAdmin ){
-            Set<Tag> tags = tagRepository.findAllByVisibleTrueAndTagNameIn(tagNames);
+            Set<Tag> tags = tagService.findAllByVisibleTrueAndTagNameIn(tagNames);
             post.setTags(tags);
         }
     }
+
+    public Post findPostById(int id){
+        return postRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Post", "Id", id));
+    }
+
+
 }

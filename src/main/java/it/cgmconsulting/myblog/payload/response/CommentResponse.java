@@ -13,5 +13,5 @@ public class CommentResponse {
     private String comment;
     private String author;
     private LocalDateTime createdAt;
-    private int parentId;
+    private Integer parentId;
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -64,5 +65,14 @@ public class TagService {
 
     public List<Tag> getAllVisibleTags(){
         return tagRepository.findByVisibleTrueOrderByTagName();
+    }
+
+
+    public Set<String> getTagNamesByPost(int postId){
+        return tagRepository.getTagNamesByPost(postId);
+    }
+
+    public Set<Tag> findAllByVisibleTrueAndTagNameIn(Set<String> tagNames){
+        return tagRepository.findAllByVisibleTrueAndTagNameIn(tagNames);
     }
 }
