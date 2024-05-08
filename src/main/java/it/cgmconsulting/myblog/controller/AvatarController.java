@@ -26,13 +26,10 @@ public class AvatarController {
 
     @Value("${application.image.avatar.size}")
     private long size;
-
     @Value("${application.image.avatar.width}")
     private int width;
-
     @Value("${application.image.avatar.height}")
     private int height;
-
     @Value("${application.image.avatar.extensions}")
     String[] extensions;
 

@@ -5,19 +5,25 @@ import it.cgmconsulting.myblog.entity.Tag;
 import it.cgmconsulting.myblog.entity.User;
 import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
 import it.cgmconsulting.myblog.payload.request.PostRequest;
+import it.cgmconsulting.myblog.payload.response.CommentResponse;
 import it.cgmconsulting.myblog.payload.response.PostDetailResponse;
 import it.cgmconsulting.myblog.payload.response.PostResponse;
+import it.cgmconsulting.myblog.repository.CommentRepository;
 import it.cgmconsulting.myblog.repository.PostRepository;
-import it.cgmconsulting.myblog.repository.TagRepository;
-import it.cgmconsulting.myblog.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +33,10 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final TagService tagService;
+    private final CommentRepository commentRepository;
+
+    @Value("${application.comment.time}")
+    private int timeToUpdate;
 
     public String  createPost(PostRequest request, UserDetails userDetails){
         Post post = new Post(request.getTitle(), request.getContent(), (User) userDetails);
@@ -60,11 +70,20 @@ public class PostService {
         if(!tagNames.isEmpty()){
             postDetailResponse.setTagNames(tagNames);
         }
+        List<CommentResponse> comments = commentRepository.getComments(id, LocalDateTime.now().minusSeconds(timeToUpdate));
+        if(!comments.isEmpty())
+            postDetailResponse.setComments(comments);
         return postDetailResponse;
     }
 
-    public List<PostResponse> getAllVisiblePosts() {
-        return postRepository.getVisiblePosts(LocalDate.now());
+    public List<PostResponse> getAllVisiblePosts(int pageNumber, int pageSize, String sortBy, String direction) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+        Page<PostResponse> posts = postRepository.getVisiblePosts(LocalDate.now(), pageable);
+        List<PostResponse> postResponses = new ArrayList<>();
+        if(posts.hasContent()) {
+            postResponses = posts.getContent();
+        }
+        return postResponses;
     }
 
     @Transactional

@@ -43,4 +43,8 @@ public class CommentController {
     // verificare se censurati
     // creati almeno 1 minuto prima della get
     // ordinati per updatedAt DESC
+    @GetMapping("/v0/comments/{postId}")
+    public ResponseEntity<?> getComments(@PathVariable @Min(1) int postId){
+        return new ResponseEntity<>(commentService.getComments(postId), HttpStatus.OK);
+    }
 }

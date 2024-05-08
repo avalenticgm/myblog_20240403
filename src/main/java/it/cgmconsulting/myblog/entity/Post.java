@@ -28,7 +28,7 @@ public class Post extends CreationUpdate {
     @Column(nullable = false, length = 65535) // 64kb
     private String content;
 
-    @Column(length = 16)
+    @Column(length = 16) // Nome immagine => id.estensione
     private String image;
 
     private LocalDate publicationDate; // se è a null oppure publicationDate.afterOrEqual(LocalDate.now()) significa che il post non è pubblicato

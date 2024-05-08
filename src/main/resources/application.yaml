@@ -65,12 +65,12 @@ logging:
       max-history: 7
       file-name-pattern: /Users/Public/myblog/log/%d{yyyy-MM, aux}/myblog.%d{yyyy-MM-dd}.%i.txt
   pattern:
-    console: "%d %-5level [%thread] %logger : %msg%n"
+    #console: "%d %-5level [%thread] %logger : %msg%n"
     file: "%d %-5level [%thread] %logger : %msg%n"
   level:
     it.cgmconsulting.myblog: info
     org.hibernate.orm.jdbc.bind: trace
-    org.springframework: off
+    org.springframework: info
 
 
 # CUSTOM PROPERTIES
@@ -94,6 +94,14 @@ application:
       height: 100
       width: 100
       extensions: jpg,jpeg,png
+    post:
+      # 100kb = 1024 byte * 5
+      size: 102400
+      # height and width in pixel
+      height: 300
+      width: 600
+      extensions: jpg,jpeg
+      path: /Users/Public/myblog/images/
   comment:
     # Lo user ha tempo 60 secondi per modificare o eliminare il proprio commento
     # Durante questo lasso di tempo il commento non è visibile se non  dall'autore stesso

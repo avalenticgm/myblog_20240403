@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +85,10 @@ public class CommentService {
             return "you can delete the comment only "+timeToUpdate+"sec after creation";
         commentRepository.deleteById(id);
         return "your comment has been deleted";
+    }
+
+    public List<CommentResponse> getComments(int postId) {
+        return commentRepository.getComments(postId, LocalDateTime.now().minusSeconds(timeToUpdate));
     }
 
 }
