@@ -65,7 +65,7 @@ logging:
       max-history: 7
       file-name-pattern: /Users/Public/myblog/log/%d{yyyy-MM, aux}/myblog.%d{yyyy-MM-dd}.%i.txt
   pattern:
-    #console: "%d %-5level %logger : %msg%n"
+    console: "%d %-5level [%thread] %logger : %msg%n"
     file: "%d %-5level [%thread] %logger : %msg%n"
   level:
     it.cgmconsulting.myblog: info
