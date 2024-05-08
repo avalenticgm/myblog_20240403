@@ -55,11 +55,22 @@ spring-doc:
     # hostname:port/swagger-ui.html => localhost:8090/api/swagger-ui.html
     path: /swagger-ui.html
 
+
 logging:
+  file:
+    name: /Users/Public/myblog/log/myblog.txt
+  logback:
+    rolling-policy:
+      max-file-size: 1024KB
+      max-history: 7
+      file-name-pattern: /Users/Public/myblog/log/%d{yyyy-MM, aux}/myblog.%d{yyyy-MM-dd}.%i.txt
+  pattern:
+    #console: "%d %-5level %logger : %msg%n"
+    file: "%d %-5level [%thread] %logger : %msg%n"
   level:
     it.cgmconsulting.myblog: info
     org.hibernate.orm.jdbc.bind: trace
-    org.springframework: info
+    org.springframework: off
 
 
 # CUSTOM PROPERTIES
