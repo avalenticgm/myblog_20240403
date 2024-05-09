@@ -74,6 +74,7 @@ public class CommentService {
 
     }
 
+    @Transactional
     public String deleteComment(int id, UserDetails userDetails) {
         Comment comment = findCommentById(id);
         // verifica autore commento
@@ -83,6 +84,7 @@ public class CommentService {
             return "you cannot delete a censored comment";
         if( comment.getCreatedAt().isBefore(LocalDateTime.now().minusSeconds(timeToUpdate)) )
             return "you can delete the comment only "+timeToUpdate+"sec after creation";
+        comment.getPostId().setTotComments((short) (comment.getPostId().getTotComments() - 1));
         commentRepository.deleteById(id);
         return "your comment has been deleted";
     }

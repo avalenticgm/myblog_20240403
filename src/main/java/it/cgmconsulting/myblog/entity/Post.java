@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -14,6 +15,10 @@ import java.util.Set;
 @Entity
 @Getter @Setter @NoArgsConstructor @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper=false)
 public class Post extends CreationUpdate {
+
+    @Transient
+    @Value("${application.image.post.path}")
+    private String path;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto increment
@@ -62,5 +67,14 @@ public class Post extends CreationUpdate {
         this.title = title;
         this.content = content;
         this.userId = userId;
+    }
+
+
+    public String getImage() {
+        return path+image;
+    }
+
+    public void setImage(String image) {
+        this.image = path+image;
     }
 }

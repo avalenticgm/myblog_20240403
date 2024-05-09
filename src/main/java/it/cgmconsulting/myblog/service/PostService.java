@@ -7,6 +7,7 @@ import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
 import it.cgmconsulting.myblog.payload.request.PostRequest;
 import it.cgmconsulting.myblog.payload.response.CommentResponse;
 import it.cgmconsulting.myblog.payload.response.PostDetailResponse;
+import it.cgmconsulting.myblog.payload.response.PostKeywordResponse;
 import it.cgmconsulting.myblog.payload.response.PostResponse;
 import it.cgmconsulting.myblog.repository.CommentRepository;
 import it.cgmconsulting.myblog.repository.PostRepository;
@@ -26,6 +27,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -111,6 +114,63 @@ public class PostService {
         return postRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Post", "Id", id));
     }
+
+    public List<PostResponse> getAllVisiblePostsByTag(int pageNumber, int pageSize, String sortBy, String direction, String tag) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+        Page<PostResponse> posts = postRepository.getVisiblePostsByTag(LocalDate.now(), pageable, tag);
+        List<PostResponse> postResponses = new ArrayList<>();
+        if(posts.hasContent()) {
+            postResponses = posts.getContent();
+        }
+        return postResponses;
+    }
+
+    public List<PostResponse> getAllVisiblePostsByAuthor(int pageNumber, int pageSize, String sortBy, String direction, String username) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+        Page<PostResponse> posts = postRepository.getVisiblePostsByAuthor(LocalDate.now(), pageable, username);
+        List<PostResponse> postResponses = new ArrayList<>();
+        if(posts.hasContent()) {
+            postResponses = posts.getContent();
+        }
+        return postResponses;
+    }
+
+
+    public List<PostResponse> getAllVisiblePostsByKeyword(int pageNumber, int pageSize, String sortBy, String direction,
+                                                                          String keyword, boolean isCaseSensitive, boolean isExactMatch) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+        Page<PostKeywordResponse> posts = postRepository.getVisiblePostsByKeyword(LocalDate.now(), pageable, '%'+keyword+'%');
+
+        Pattern pattern = null;
+
+        if(!isCaseSensitive && !isExactMatch) {
+            pattern = Pattern.compile(keyword, Pattern.CASE_INSENSITIVE);
+        } else if (!isCaseSensitive && isExactMatch){
+            pattern = Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE);
+        } else if (isCaseSensitive && !isExactMatch){
+            pattern = Pattern.compile(keyword);
+        } else if (isCaseSensitive && isExactMatch){
+            pattern = Pattern.compile("\\b" + keyword + "\\b");
+        }
+
+
+        List<PostResponse> postResponses = new ArrayList<>();
+        if(posts.hasContent()) {
+           for(PostKeywordResponse p : posts.getContent()) {
+                if ((pattern.matcher(p.getTitle().concat(" ").concat(p.getContent())).find()))
+                    postResponses.add(new PostResponse(
+                            p.getId(),
+                            p.getTitle(),
+                            p.getOverview(),
+                            p.getImage(),
+                            p.getTotComments(),
+                            p.getAverage()
+                    ));
+           }
+        }
+        return postResponses;
+    }
+
 
 
 }

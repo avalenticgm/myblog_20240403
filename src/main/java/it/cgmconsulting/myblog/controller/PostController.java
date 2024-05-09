@@ -6,9 +6,7 @@ import it.cgmconsulting.myblog.payload.response.PostResponse;
 import it.cgmconsulting.myblog.service.ImageService;
 import it.cgmconsulting.myblog.service.PostService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -103,6 +101,57 @@ public class PostController {
         if(msg != null)
             return new ResponseEntity<>(msg, HttpStatus.OK);
         return new ResponseEntity<>("Something went wrong uploading the image", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    // ricerche per tag, autore e parola chiave
+
+    @GetMapping("/v0/posts/tags")
+    public ResponseEntity<?> getAllVisiblePostsByTag(
+            @RequestParam @Size(max=50) @NotBlank String tag,
+            @RequestParam(defaultValue = "0") int pageNumber, // numero di pagina da cui partire
+            @RequestParam(defaultValue = "10") int pageSize, // numero di elementi per pagina
+            @RequestParam(defaultValue = "publicationDate") String sortBy, // indica la colonna su cui eseguire l'ordinamento
+            @RequestParam(defaultValue = "DESC") String direction // indica se l'ordinamento è ASC o DESC
+    ){
+        List<PostResponse> list = postService.getAllVisiblePostsByTag(pageNumber, pageSize, sortBy, direction, tag);
+        if(list.isEmpty())
+            return new ResponseEntity<>("No posts found with tag "+tag, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/v0/posts/author")
+    public ResponseEntity<?> getAllVisiblePostsByAuthor(
+            @RequestParam @Size(max=20) @NotBlank String username,
+            @RequestParam(defaultValue = "0") int pageNumber, // numero di pagina da cui partire
+            @RequestParam(defaultValue = "10") int pageSize, // numero di elementi per pagina
+            @RequestParam(defaultValue = "publicationDate") String sortBy, // indica la colonna su cui eseguire l'ordinamento
+            @RequestParam(defaultValue = "DESC") String direction // indica se l'ordinamento è ASC o DESC
+    ){
+        List<PostResponse> list = postService.getAllVisiblePostsByAuthor(pageNumber, pageSize, sortBy, direction, username);
+        if(list.isEmpty())
+            return new ResponseEntity<>("No posts found written by "+username, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/v0/posts/keyword")
+    public ResponseEntity<?> getAllVisiblePostsByKeyword(
+            @RequestParam @Size(min=3) @NotBlank String keyword,
+            @RequestParam(defaultValue = "false") boolean isCaseSensitive,
+            @RequestParam(defaultValue = "false") boolean isExactMatch,
+            @RequestParam(defaultValue = "0") int pageNumber, // numero di pagina da cui partire
+            @RequestParam(defaultValue = "10") int pageSize, // numero di elementi per pagina
+            @RequestParam(defaultValue = "publicationDate") String sortBy, // indica la colonna su cui eseguire l'ordinamento
+            @RequestParam(defaultValue = "DESC") String direction // indica se l'ordinamento è ASC o DESC
+    ){
+        List<PostResponse> list = postService.getAllVisiblePostsByKeyword(pageNumber, pageSize, sortBy, direction, keyword, isCaseSensitive, isExactMatch);
+        if(list.isEmpty())
+            return new ResponseEntity<>("No posts found containing "+keyword, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+        /*
+        * isExactMatch = true,  keyword 'mare' : Il mare è blu; Vado al mare. ;
+        * isExactMatch = false, keyword 'mare' : Il maremoto è terribile;
+        * */
     }
 
 
