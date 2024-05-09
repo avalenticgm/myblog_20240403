@@ -16,10 +16,6 @@ import java.util.Set;
 @Getter @Setter @NoArgsConstructor @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper=false)
 public class Post extends CreationUpdate {
 
-    @Transient
-    @Value("${application.image.post.path}")
-    private String path;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto increment
     @EqualsAndHashCode.Include
@@ -51,6 +47,7 @@ public class Post extends CreationUpdate {
     @OrderBy("tagName ASC")
     private Set<Tag> tags = new HashSet<>();
 
+
     // Questi due metodi servono per sincronizzare gli oggetii Post e Tag quando
     // aggiungo o rimuovo un Tag ad un Post.
     public void addTag(Tag tag){
@@ -63,18 +60,11 @@ public class Post extends CreationUpdate {
         tag.getPosts().remove(this);
     }
 
-    public Post(String title, String content, User userId) {
+    public Post(String title, String content, User userId, String overview) {
         this.title = title;
         this.content = content;
         this.userId = userId;
+        this.overview = overview;
     }
 
-
-    public String getImage() {
-        return path+image;
-    }
-
-    public void setImage(String image) {
-        this.image = path+image;
-    }
 }

@@ -41,8 +41,13 @@ public class PostService {
     @Value("${application.comment.time}")
     private int timeToUpdate;
 
+    @Value("${application.image.post.path}")
+    private String path;
+
     public String  createPost(PostRequest request, UserDetails userDetails){
-        Post post = new Post(request.getTitle(), request.getContent(), (User) userDetails);
+        String content = request.getContent();
+        String overview = content.length() <= 255 ? content : content.substring(0,251).concat("...");
+        Post post = new Post(request.getTitle(), content, (User) userDetails, overview);
         postRepository.save(post);
         return "New post having title "+post.getTitle()+" has been created";
     }
@@ -55,8 +60,11 @@ public class PostService {
                 .anyMatch("ADMIN"::equals);
 
         if( user.getId() == post.getUserId().getId() || isAdmin ){
+            String content = request.getContent();
+            String overview = content.length() <= 255 ? content : content.substring(0,251).concat("...");
             post.setTitle(request.getTitle());
-            post.setContent(request.getContent());
+            post.setOverview(overview);
+            post.setContent(content);
             post.setUpdatedAt(LocalDateTime.now());
             post.setPublicationDate(null);
             postRepository.save(post);
@@ -67,7 +75,7 @@ public class PostService {
     }
 
     public PostDetailResponse getPost(int id){
-        PostDetailResponse postDetailResponse = postRepository.getPostById(id, LocalDate.now()).orElseThrow(
+        PostDetailResponse postDetailResponse = postRepository.getPostById(id, LocalDate.now(), path).orElseThrow(
                 () -> new ResourceNotFoundException("Post", "Id", id));
         Set<String> tagNames = tagService.getTagNamesByPost(id);
         if(!tagNames.isEmpty()){
@@ -81,7 +89,7 @@ public class PostService {
 
     public List<PostResponse> getAllVisiblePosts(int pageNumber, int pageSize, String sortBy, String direction) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
-        Page<PostResponse> posts = postRepository.getVisiblePosts(LocalDate.now(), pageable);
+        Page<PostResponse> posts = postRepository.getVisiblePosts(LocalDate.now(), pageable, path);
         List<PostResponse> postResponses = new ArrayList<>();
         if(posts.hasContent()) {
             postResponses = posts.getContent();
@@ -117,7 +125,7 @@ public class PostService {
 
     public List<PostResponse> getAllVisiblePostsByTag(int pageNumber, int pageSize, String sortBy, String direction, String tag) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
-        Page<PostResponse> posts = postRepository.getVisiblePostsByTag(LocalDate.now(), pageable, tag);
+        Page<PostResponse> posts = postRepository.getVisiblePostsByTag(LocalDate.now(), pageable, tag, path);
         List<PostResponse> postResponses = new ArrayList<>();
         if(posts.hasContent()) {
             postResponses = posts.getContent();
@@ -127,7 +135,7 @@ public class PostService {
 
     public List<PostResponse> getAllVisiblePostsByAuthor(int pageNumber, int pageSize, String sortBy, String direction, String username) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
-        Page<PostResponse> posts = postRepository.getVisiblePostsByAuthor(LocalDate.now(), pageable, username);
+        Page<PostResponse> posts = postRepository.getVisiblePostsByAuthor(LocalDate.now(), pageable, username, path);
         List<PostResponse> postResponses = new ArrayList<>();
         if(posts.hasContent()) {
             postResponses = posts.getContent();
@@ -139,7 +147,7 @@ public class PostService {
     public List<PostResponse> getAllVisiblePostsByKeyword(int pageNumber, int pageSize, String sortBy, String direction,
                                                                           String keyword, boolean isCaseSensitive, boolean isExactMatch) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
-        Page<PostKeywordResponse> posts = postRepository.getVisiblePostsByKeyword(LocalDate.now(), pageable, '%'+keyword+'%');
+        Page<PostKeywordResponse> posts = postRepository.getVisiblePostsByKeyword(LocalDate.now(), pageable, '%'+keyword+'%', path);
 
         Pattern pattern = null;
 
