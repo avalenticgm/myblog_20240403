@@ -1,6 +1,8 @@
 package it.cgmconsulting.myblog.repository;
 
 import it.cgmconsulting.myblog.entity.Post;
+import it.cgmconsulting.myblog.entity.User;
+import it.cgmconsulting.myblog.payload.response.BookmarkResponse;
 import it.cgmconsulting.myblog.payload.response.PostDetailResponse;
 import it.cgmconsulting.myblog.payload.response.PostKeywordResponse;
 import it.cgmconsulting.myblog.payload.response.PostResponse;
@@ -11,7 +13,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
@@ -82,4 +86,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "WHERE (p.publicationDate IS NOT NULL AND p.publicationDate <= :now) " +
             "AND (p.title LIKE :keyword OR p.content LIKE :keyword)")
     Page<PostKeywordResponse> getVisiblePostsByKeyword(LocalDate now, Pageable pageable, String keyword, String path);
+
+
+
 }

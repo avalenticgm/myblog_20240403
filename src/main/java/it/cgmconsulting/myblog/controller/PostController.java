@@ -150,9 +150,24 @@ public class PostController {
         return new ResponseEntity<>(list, HttpStatus.OK);
         /*
         * isExactMatch = true,  keyword 'mare' : Il mare è blu; Vado al mare. ;
-        * isExactMatch = false, keyword 'mare' : Il maremoto è terribile;
+        * isExactMatch = false, keyword 'mare' : Il maremoto è terribile; amare i fiori;
         * */
     }
 
+    // aggiunta o la rimozione di un bookmark
+    @PostMapping("/v1/posts/bookmark")
+    @PreAuthorize("hasAuthority('MEMBER')") // SpEL -> Spring Expression Language
+    public ResponseEntity<?> addRemoveBookmark(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam @Min(1) int postId){
+        return new ResponseEntity<>(postService.addRemoveBookmark(userDetails, postId), HttpStatus.OK);
+    }
+
+    @GetMapping("/v1/posts/bookmark")
+    @PreAuthorize("hasAuthority('MEMBER')") // SpEL -> Spring Expression Language
+    public ResponseEntity<?> getBookmarks(
+            @AuthenticationPrincipal UserDetails userDetails){
+        return new ResponseEntity<>(postService.getBookmarks(userDetails), HttpStatus.OK);
+    }
 
 }

@@ -5,12 +5,10 @@ import it.cgmconsulting.myblog.entity.Tag;
 import it.cgmconsulting.myblog.entity.User;
 import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
 import it.cgmconsulting.myblog.payload.request.PostRequest;
-import it.cgmconsulting.myblog.payload.response.CommentResponse;
-import it.cgmconsulting.myblog.payload.response.PostDetailResponse;
-import it.cgmconsulting.myblog.payload.response.PostKeywordResponse;
-import it.cgmconsulting.myblog.payload.response.PostResponse;
+import it.cgmconsulting.myblog.payload.response.*;
 import it.cgmconsulting.myblog.repository.CommentRepository;
 import it.cgmconsulting.myblog.repository.PostRepository;
+import it.cgmconsulting.myblog.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +35,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagService tagService;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     @Value("${application.comment.time}")
     private int timeToUpdate;
@@ -180,5 +179,30 @@ public class PostService {
     }
 
 
+    @Transactional
+    public String addRemoveBookmark(UserDetails userDetails, int postId) {
+        User user = (User) userDetails;
+        Post post = findPostById(postId);
+        User u = userRepository.getUserWithPreferredPost(user.getId());
+        String msg = "Post has been added to preferred";
 
+        if(u.getPreferredPosts().contains(post)) {
+            u.getPreferredPosts().remove(post);
+            msg = "Post has been removed from preferred";
+        } else {
+            u.getPreferredPosts().add(post);
+        }
+        return msg;
+    }
+
+    public List<BookmarkResponse> getBookmarks(UserDetails userDetails) {
+        User user = (User) userDetails;
+        User u = userRepository.getUserWithPreferredPost(user.getId());
+        List<BookmarkResponse> bookmarks = new ArrayList<>();
+        for(Post p : u.getPreferredPosts()){
+            if(p.getPublicationDate() != null && p.getPublicationDate().isBefore(LocalDate.now().plusDays(1)))
+                bookmarks.add(new BookmarkResponse(p.getId(), p.getTitle()));
+        }
+        return bookmarks;
+    }
 }
