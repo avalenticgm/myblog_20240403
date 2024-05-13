@@ -65,13 +65,14 @@ public class ReasonService {
 }
 
 /*
+lista iniziale
 INSULTI RAZZIALI        2023-01-01  null
 LINGUAGGIO NON CONSONO  2024-01-01  2024-12-31
 LINGUAGGIO NON CONSONO  2025-01-01  null
 LINK                    2023-01-01  null
 TROLLING                2024-01-01  null
- */
-/*
+
+lista ripulita
 INSULTI RAZZIALI        2023-01-01  null
 LINGUAGGIO NON CONSONO  2024-01-01  2024-12-31
 LINK                    2023-01-01  null
