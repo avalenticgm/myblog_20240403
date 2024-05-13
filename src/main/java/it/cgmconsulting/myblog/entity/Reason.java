@@ -21,7 +21,7 @@ public class Reason {
 
     private int severity;
 
-    public Reason(ReasonId reasonId, byte severity) {
+    public Reason(ReasonId reasonId, int severity) {
         this.reasonId = reasonId;
         this.severity = severity;
     }

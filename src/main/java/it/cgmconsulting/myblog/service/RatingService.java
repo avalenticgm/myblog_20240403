@@ -30,13 +30,12 @@ public class RatingService {
     public void deleteRate(UserDetails userDetails, int postId) {
         User user = (User) userDetails;
         // cancellazione secca: non controllo se esiste il record, cancello e basta
-        ratingRepository.deleteRating(user.getId(), postId);
+        ratingRepository.deleteRating(postId, user.getId());
     }
 
     public byte getMyRate(UserDetails userDetails, int postId) {
-
-        // recuperare il voto dato via SQL NATIVO
-        // qualora l'utente non abbia votato, restituire 0
-        return 0;
+        User user = (User) userDetails;
+        Byte rate = ratingRepository.getMyRate(postId, user.getId());
+        return rate == null ? 0 : rate;
     }
 }

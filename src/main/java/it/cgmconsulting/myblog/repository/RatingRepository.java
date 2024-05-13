@@ -15,4 +15,13 @@ public interface RatingRepository extends JpaRepository<Rating, RatingId> {
             "WHERE post_id = :postId " +
             "AND user_id = :userId", nativeQuery = true)
     void deleteRating(int postId, int userId);
+
+
+    @Query(value="SELECT r.rate " +
+            "FROM Rating r " +
+            "WHERE r.ratingId.postId.id = :postId " +
+            "AND r.ratingId.userId.id = :userId")
+    Byte getMyRate(int postId, int userId); // uso il wrapper perchè se non c'è un record viene restituito null
+
 }
+
