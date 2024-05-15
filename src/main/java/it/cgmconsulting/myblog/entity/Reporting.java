@@ -22,8 +22,13 @@ public class Reporting extends CreationUpdate {
     @Enumerated(EnumType.STRING)
     private ReportingStatus status = ReportingStatus.NEW;
 
-    public Reporting(ReportingId reportingId, Reason reason) {
+    @ManyToOne
+    @JoinColumn(name = "reporter", nullable = false)
+    private User reporter;
+
+    public Reporting(ReportingId reportingId, Reason reason, User reporter) {
         this.reportingId = reportingId;
         this.reason = reason;
+        this.reporter = reporter;
     }
 }

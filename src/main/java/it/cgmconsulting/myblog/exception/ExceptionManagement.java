@@ -25,6 +25,11 @@ public class ExceptionManagement {
         return new ResponseEntity<String>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(CommentReportingException.class)
+    public ResponseEntity<String> commentReportingExceptionManagement(CommentReportingException ex){
+        return new ResponseEntity<String>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(GenericException.class)
     public ResponseEntity<String> genericExceptionManagement(GenericException ex){
         return new ResponseEntity<String>(ex.getMessage(), HttpStatus.CONFLICT);

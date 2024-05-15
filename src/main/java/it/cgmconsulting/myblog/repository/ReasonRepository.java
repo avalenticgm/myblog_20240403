@@ -20,8 +20,8 @@ public interface ReasonRepository extends JpaRepository<Reason, ReasonId> {
           )
     List<Reason> getValidReason(String reason, LocalDate now);
 
-    @Query(value="SELECT r FROM Reason r " +
+    @Query(value="SELECT r.reasonId FROM Reason r " +
             "WHERE (r.endDate IS NULL OR (:now BETWEEN r.reasonId.startDate AND r.endDate))"
     )
-    List<Reason> getValidReasons(LocalDate now);
+    List<ReasonId> getValidReasons(LocalDate now);
 }

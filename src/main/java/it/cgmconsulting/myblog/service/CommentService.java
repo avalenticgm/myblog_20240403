@@ -3,6 +3,7 @@ package it.cgmconsulting.myblog.service;
 import it.cgmconsulting.myblog.entity.Comment;
 import it.cgmconsulting.myblog.entity.Post;
 import it.cgmconsulting.myblog.entity.User;
+import it.cgmconsulting.myblog.exception.CommentReportingException;
 import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
 import it.cgmconsulting.myblog.payload.request.CommentRequest;
 import it.cgmconsulting.myblog.payload.request.CommentUpdateRequest;
@@ -55,6 +56,11 @@ public class CommentService {
     public Comment findCommentById(int id){
         return commentRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Comment", "Id", id));
+    }
+
+    public Comment getCommentToReport(int id){
+        return commentRepository.getCommentToReport(id).orElseThrow(
+                () -> new CommentReportingException("Comment", "Id", id));
     }
 
     @Transactional

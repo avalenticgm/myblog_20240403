@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
     @Query("select new it.cgmconsulting.myblog.payload.response.CommentResponse(" +
@@ -20,5 +21,11 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
             "AND c.updatedAt <= :now " +
             "ORDER BY c.updatedAt DESC ")
     List<CommentResponse> getComments(int postId, LocalDateTime now);
+
+    @Query(value="SELECT c FROM Comment c " +
+            "LEFT JOIN Reporting r ON c = r.reportingId.commentId " +
+            "WHERE c.id = :commentId " +
+            "AND r.createdAt IS NULL ")
+    Optional<Comment> getCommentToReport(int commentId);
 
 }
