@@ -1,5 +1,6 @@
 package it.cgmconsulting.myblog.controller;
 
+import it.cgmconsulting.myblog.entity.enumeration.ReportingStatus;
 import it.cgmconsulting.myblog.service.ReportingService;
 import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,5 +33,16 @@ public class ReportingController {
             @RequestParam @NotNull LocalDate startDate
     ){
         return new ResponseEntity<String>(reportingService.createReport(userDetails, commentId, reason, startDate), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/v1/reportings")
+    @PreAuthorize("hasAuthority('MODERATOR')")
+    public ResponseEntity<?> updateReport(
+            @RequestParam @NotBlank @Size(min=3, max=30) String reason, // reason e startDate formano la PK per l'entità Reason
+            @RequestParam @NotNull LocalDate startDate,
+            @RequestParam ReportingStatus status,
+            @RequestParam @Min(1) int commentId
+    ){
+        return new ResponseEntity<String>(reportingService.updateReport(reason, startDate, status, commentId), HttpStatus.OK);
     }
 }

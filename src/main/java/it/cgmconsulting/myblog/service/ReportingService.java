@@ -1,7 +1,10 @@
 package it.cgmconsulting.myblog.service;
 
 import it.cgmconsulting.myblog.entity.*;
+import it.cgmconsulting.myblog.entity.enumeration.ReportingStatus;
+import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
 import it.cgmconsulting.myblog.repository.ReportingRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -36,4 +39,34 @@ public class ReportingService {
 
         return "The comment '"+c.getComment()+"' has been reported";
     }
+
+    @Transactional
+    public String updateReport(String reason, LocalDate startDate, ReportingStatus status, int commentId) {
+        // trovare il report e verificare che non sia già stato chiuso
+        Comment comment = commentService.findCommentById(commentId);
+        Reporting rep = findById(new ReportingId(comment));
+
+        if(rep.getStatus().name().startsWith("CLOSED"))
+            return "The report i already in status 'CLOSED'";
+
+        else if(rep.getStatus().equals(ReportingStatus.IN_PROGRESS) && status.equals(ReportingStatus.NEW))
+            return "Changing status not allowed";
+
+        else {
+            if(status.equals(ReportingStatus.CLOSED_WITH_BAN)){
+                comment.setCensored(true);
+                comment.getUserId().setEnabled(false);
+            }
+            rep.setStatus(status);
+        }
+        return null;
+    }
+
+    public Reporting findById(ReportingId reportingId) {
+        return reportingRepository.findById(reportingId).orElseThrow(
+                () -> new ResourceNotFoundException("Reporting", "comment",reportingId.getCommentId().getId()));
+    }
+
 }
+
+
