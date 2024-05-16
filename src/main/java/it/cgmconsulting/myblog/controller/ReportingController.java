@@ -55,4 +55,10 @@ public class ReportingController {
         return new ResponseEntity<>(reportingService.getReports(pageNumber, pageSize, sortBy, direction, status), HttpStatus.OK);
         //return ResponseEntity.ok(reportingService.getReports(pageNumber, pageSize, sortBy, direction, status));
     }
+
+    @GetMapping("/v1/reportings/{commentId}")
+    @PreAuthorize("hasAuthority('MODERATOR')")
+    public ResponseEntity<?> getReportDetail(@PathVariable @Min(1) int commentId){
+        return new ResponseEntity<>(reportingService.getReportDetail(commentId), HttpStatus.OK);
+    }
 }

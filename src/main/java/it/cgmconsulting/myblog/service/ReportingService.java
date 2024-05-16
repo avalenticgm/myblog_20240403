@@ -3,6 +3,7 @@ package it.cgmconsulting.myblog.service;
 import it.cgmconsulting.myblog.entity.*;
 import it.cgmconsulting.myblog.entity.enumeration.ReportingStatus;
 import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
+import it.cgmconsulting.myblog.payload.response.ReportingDetailResponse;
 import it.cgmconsulting.myblog.payload.response.ReportingResponse;
 import it.cgmconsulting.myblog.repository.ReportingRepository;
 import jakarta.transaction.Transactional;
@@ -87,6 +88,14 @@ public class ReportingService {
         return reportingRepository.getReportings(status, pageable).getContent();
     }
 
+    public ReportingDetailResponse getReportDetail(int commentId){
+        return findReportingById(commentId);
+    }
+
+    public ReportingDetailResponse findReportingById(int commentId) {
+        return reportingRepository.getReportDetail(commentId).orElseThrow(
+                () -> new ResourceNotFoundException("Report", "Id", commentId));
+    }
 }
 
 
