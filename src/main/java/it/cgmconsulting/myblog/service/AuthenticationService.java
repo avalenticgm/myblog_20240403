@@ -30,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -78,6 +79,7 @@ public class AuthenticationService {
         return "User succesfully registered. Please check your email to confirm the registration.";
     }
 
+    @Transactional
     public AuthenticationResponse signin(SigninRequest request){
 
         User user = userRepository.findByUsername(request.getUsername())
@@ -92,8 +94,14 @@ public class AuthenticationService {
             throw new DisabledException("You didn't confirm your email still");
 
         // caso in cui l'utente sia stato bannato
-        if(!user.isEnabled() && !isGuest)
-            throw new DisabledException("You are banned");
+        if(!user.isEnabled() && !isGuest){
+            if (!user.getBannedUntil().isAfter(LocalDateTime.now())){
+                user.setEnabled(true);
+                user.setBannedUntil(null);
+            } else {
+                throw new DisabledException("You are banned until "+user.getBannedUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            }
+        }
 
         String jwt = jwtService.generateToken(user, user.getId());
 

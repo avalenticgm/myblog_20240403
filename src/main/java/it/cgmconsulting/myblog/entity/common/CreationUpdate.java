@@ -1,5 +1,6 @@
 package it.cgmconsulting.myblog.entity.common;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
