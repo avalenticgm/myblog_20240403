@@ -38,4 +38,5 @@ public class RatingService {
         Byte rate = ratingRepository.getMyRate(postId, user.getId());
         return rate == null ? 0 : rate;
     }
+
 }

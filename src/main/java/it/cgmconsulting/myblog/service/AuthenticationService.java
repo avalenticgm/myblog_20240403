@@ -2,6 +2,7 @@ package it.cgmconsulting.myblog.service;
 
 import it.cgmconsulting.myblog.entity.*;
 import it.cgmconsulting.myblog.entity.enumeration.AuthorityName;
+import it.cgmconsulting.myblog.entity.enumeration.Frequency;
 import it.cgmconsulting.myblog.exception.ResourceNotFoundException;
 import it.cgmconsulting.myblog.mail.Mail;
 import it.cgmconsulting.myblog.mail.MailService;
@@ -14,6 +15,7 @@ import it.cgmconsulting.myblog.payload.response.AvatarResponse;
 import it.cgmconsulting.myblog.payload.response.GetMeResponse;
 import it.cgmconsulting.myblog.repository.AuthorityRepository;
 import it.cgmconsulting.myblog.repository.AvatarRepository;
+import it.cgmconsulting.myblog.repository.ConsentRepository;
 import it.cgmconsulting.myblog.repository.UserRepository;
 import it.cgmconsulting.myblog.security.JwtService;
 import jakarta.mail.MessagingException;
@@ -28,6 +30,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -49,11 +52,15 @@ public class AuthenticationService {
     private final MailService mailService;
     private final RegistrationService registrationService;
     private final AvatarRepository avatarRepository;
+    private final ConsentService consentService;
 
 
 
     @Transactional
     public String signup(SignupRequest request) {
+        if(!request.isAcceptRules())
+            return "Without consent is not possible to proceed";
+
         if(userRepository.existsByUsernameOrEmail(request.getUsername(), request.getEmail()))
             return null;
         User user = new User(
@@ -64,6 +71,14 @@ public class AuthenticationService {
         Authority authority = authorityRepository.findByAuthorityDefaultTrue();
         user.setAuthorities(Collections.singleton(authority));
         userRepository.save(user);
+
+        Consent consent = null;
+        if(request.isSendNewsletter())
+            consent = new Consent(new ConsentId(user), true, true, Frequency.WEEKLY, null);
+        else
+            consent = new Consent(new ConsentId(user), true, false, Frequency.NEVER, null);
+
+        consentService.save(consent);
 
         Registration registration = Registration.builder()
                 .confirmCode(UUID.randomUUID().toString())
@@ -274,4 +289,6 @@ public class AuthenticationService {
         userRepository.save(user);
         return "Your account has been removed";
     }
+
+
 }

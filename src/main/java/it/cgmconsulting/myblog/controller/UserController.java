@@ -1,5 +1,6 @@
 package it.cgmconsulting.myblog.controller;
 
+import it.cgmconsulting.myblog.entity.enumeration.Frequency;
 import it.cgmconsulting.myblog.payload.request.ChangeMeRequest;
 import it.cgmconsulting.myblog.payload.request.ChangePasswordRequest;
 import it.cgmconsulting.myblog.payload.request.SigninRequest;
@@ -8,6 +9,7 @@ import it.cgmconsulting.myblog.payload.response.AuthenticationResponse;
 import it.cgmconsulting.myblog.payload.response.GetMeResponse;
 import it.cgmconsulting.myblog.service.AuthenticationService;
 
+import it.cgmconsulting.myblog.service.ConsentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -31,6 +33,7 @@ import java.util.Set;
 public class UserController {
 
     private final AuthenticationService authenticationService;
+    private final ConsentService consentService;
 
     @PostMapping("/v0/auth/signup")
     public ResponseEntity<String> signup(@RequestBody @Valid SignupRequest request) {
@@ -90,6 +93,14 @@ public class UserController {
     @PutMapping("/v1/user/remove")
     public ResponseEntity<?> deleteMe(@AuthenticationPrincipal UserDetails userDetails){
         return new ResponseEntity<>(authenticationService.deleteMe(userDetails), HttpStatus.OK);
+
+    }
+
+    @PatchMapping("/v1/user/consent")
+    public ResponseEntity<?> updateConsent(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam Frequency frequency){
+        return ResponseEntity.ok(consentService.updateConsent(userDetails, frequency));
 
     }
 
