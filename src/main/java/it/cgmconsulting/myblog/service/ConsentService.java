@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ConsentService {
@@ -43,5 +45,13 @@ public class ConsentService {
     public Consent getConsentById(ConsentId consentId) {
         return consentRepository.findById(consentId).orElseThrow(
                 () -> new ResourceNotFoundException("Consent", "id", consentId));
+    }
+
+    public List<Consent> getNewsletterConsent(){
+        return consentRepository.getNewsletterConsent();
+    }
+
+    public List<Consent> getNewsletterMembers(){
+        return consentRepository.findBySendNewsletterTrue();
     }
 }

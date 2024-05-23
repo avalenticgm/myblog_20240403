@@ -205,4 +205,12 @@ public class PostService {
         }
         return bookmarks;
     }
+
+    public List<Post> getLastWeekPosts(){
+        return postRepository.findByPublicationDateAfter(LocalDate.now().minusWeeks(1));
+    }
+
+    public List<Post> getLastMonthPosts(){
+        return postRepository.findByPublicationDateAfter(LocalDate.now().minusMonths(1));
+    }
 }
